@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: LGTM
+  profiles:
+    active: ${ACTIVATED_PROFILE:dev}
+  jpa:
+    open-in-view: false
