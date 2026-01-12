@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AbstractTimeEntity extends AbstractEntity{
+public abstract class AbstractTimeEntity extends AbstractEntity {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
