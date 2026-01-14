@@ -7,7 +7,7 @@ import zip.hyeon.lgtm.domain.auth.Provider;
 
 public interface AuthRepository extends Repository<Auth, Long> {
 
-    Auth save(Auth auth);
+    void save(Auth auth);
 
     Optional<Auth> findByProviderAndProviderId(Provider provider, String providerId);
 }
