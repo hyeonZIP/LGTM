@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import zip.hyeon.lgtm.application.member.dto.MemberRegisterRequest;
+import zip.hyeon.lgtm.application.member.dto.MemberUpdateRequest;
 import zip.hyeon.lgtm.domain.AbstractTimeEntity;
 
 @Entity
@@ -42,7 +43,7 @@ public class Member extends AbstractTimeEntity {
         return member;
     }
 
-    public void update(MemberRegisterRequest request) {
+    public void update(MemberUpdateRequest request) {
         this.username = requireNonNull(request.username());
         this.profileImageUrl = requireNonNull(request.profileImageUrl());
     }

@@ -1,7 +1,7 @@
 package zip.hyeon.lgtm.application.member.provided;
 
 import jakarta.validation.Valid;
-import zip.hyeon.lgtm.application.member.dto.MemberRegisterRequest;
+import zip.hyeon.lgtm.application.member.dto.OAuth2MemberRegisterRequest;
 import zip.hyeon.lgtm.domain.member.Member;
 
 /**
@@ -9,5 +9,5 @@ import zip.hyeon.lgtm.domain.member.Member;
  */
 public interface MemberRegister {
 
-    Member registerOrUpdate(@Valid MemberRegisterRequest request);
+    Member registerOrUpdate(@Valid OAuth2MemberRegisterRequest request);
 }

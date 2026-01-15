@@ -1,13 +1,16 @@
 package zip.hyeon.lgtm.application.member;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import zip.hyeon.lgtm.application.auth.dto.AuthFindRequest;
 import zip.hyeon.lgtm.application.auth.dto.AuthRegisterRequest;
+import zip.hyeon.lgtm.application.auth.provided.AuthFinder;
 import zip.hyeon.lgtm.application.auth.provided.AuthRegister;
-import zip.hyeon.lgtm.application.auth.required.AuthRepository;
 import zip.hyeon.lgtm.application.member.dto.MemberRegisterRequest;
+import zip.hyeon.lgtm.application.member.dto.MemberUpdateRequest;
+import zip.hyeon.lgtm.application.member.dto.OAuth2MemberRegisterRequest;
+import zip.hyeon.lgtm.application.member.provided.MemberFinder;
 import zip.hyeon.lgtm.application.member.provided.MemberRegister;
 import zip.hyeon.lgtm.application.member.required.MemberRepository;
 import zip.hyeon.lgtm.domain.member.Member;
@@ -17,31 +20,49 @@ import zip.hyeon.lgtm.domain.member.Member;
 @RequiredArgsConstructor
 public class MemberModifyService implements MemberRegister {
 
-    private final AuthRepository authRepository;
+    private final MemberFinder memberFinder;
     private final AuthRegister authRegister;
     private final MemberRepository memberRepository;
+    private final AuthFinder authFinder;
 
     @Override
-    public Member registerOrUpdate(MemberRegisterRequest request) {
-        return authRepository.findByProviderAndProviderId(request.provider(), request.providerId())
-            .map(auth -> {
-                Member member = memberRepository.findById(auth.getMember().getId()).orElseThrow(
-                    () -> new EntityNotFoundException("해당 인증 정보와 연결된 회원 정보를 찾을 수 없습니다."));
+    public Member registerOrUpdate(OAuth2MemberRegisterRequest request) {
 
-                member.update(request);
-
-                return memberRepository.save(member);
-            }).orElseGet(() -> {
-                Member member = memberRepository.save(Member.register(request));
-
-                authRegister.register(toAuthRegisterRequest(request, member));
-
-                return member;
-            });
+        return authFinder.find(toAuthFindRequest(request))
+            .map(auth -> getUpdatedMember(auth.getMember().getId(), request))
+            .orElseGet(() -> getRegisteredMember(request));
     }
 
-    private AuthRegisterRequest toAuthRegisterRequest(MemberRegisterRequest request,
+    private Member getRegisteredMember(OAuth2MemberRegisterRequest request) {
+        Member member = Member.register(toMemberRegisterRequest(request));
+
+        authRegister.register(toAuthRegisterRequest(request, member));
+
+        return memberRepository.save(member);
+    }
+
+    private Member getUpdatedMember(Long auth, OAuth2MemberRegisterRequest request) {
+        Member member = memberFinder.find(auth);
+
+        member.update(toMemberUpdateRequest(request));
+
+        return memberRepository.save(member);
+    }
+
+    private AuthFindRequest toAuthFindRequest(OAuth2MemberRegisterRequest request) {
+        return new AuthFindRequest(request.provider(), request.providerId());
+    }
+
+    private AuthRegisterRequest toAuthRegisterRequest(OAuth2MemberRegisterRequest request,
         Member member) {
         return new AuthRegisterRequest(request.provider(), request.providerId(), member);
+    }
+
+    private MemberUpdateRequest toMemberUpdateRequest(OAuth2MemberRegisterRequest request) {
+        return new MemberUpdateRequest(request.username(), request.profileImageUrl());
+    }
+
+    private MemberRegisterRequest toMemberRegisterRequest(OAuth2MemberRegisterRequest request) {
+        return new MemberRegisterRequest(request.username(), request.profileImageUrl());
     }
 }
