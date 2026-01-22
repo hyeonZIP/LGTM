@@ -1,4 +1,4 @@
-package zip.hyeon.lgtm.application.member.dto;
+package zip.hyeon.lgtm.domain.member;
 
 public record MemberRegisterRequest(
     String username,

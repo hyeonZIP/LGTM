@@ -9,8 +9,6 @@ import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import zip.hyeon.lgtm.application.member.dto.MemberRegisterRequest;
-import zip.hyeon.lgtm.application.member.dto.MemberUpdateRequest;
 import zip.hyeon.lgtm.domain.AbstractTimeEntity;
 
 @Entity
