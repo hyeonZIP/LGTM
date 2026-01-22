@@ -28,8 +28,8 @@ public class MemberModifyService implements MemberRegister {
     @Override
     public Member registerOrUpdate(OAuth2MemberRegisterRequest request) {
 
-        return authFinder.find(toAuthFindRequest(request))
-            .map(auth -> getUpdatedMember(auth.getMember().getId(), request))
+        return authFinder.findMemberIdByProviderAndProviderId(toAuthFindRequest(request))
+            .map(memberId -> getUpdatedMember(memberId, request))
             .orElseGet(() -> getRegisteredMember(request));
     }
 
@@ -41,8 +41,8 @@ public class MemberModifyService implements MemberRegister {
         return memberRepository.save(member);
     }
 
-    private Member getUpdatedMember(Long auth, OAuth2MemberRegisterRequest request) {
-        Member member = memberFinder.find(auth);
+    private Member getUpdatedMember(Long memberId, OAuth2MemberRegisterRequest request) {
+        Member member = memberFinder.find(memberId);
 
         member.update(toMemberUpdateRequest(request));
 
